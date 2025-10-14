@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>משחק גרירה: השוואה בין וונדר וומן לזקן והעקרב</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for the completion icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* הגדרות גופנים ובסיס */
+        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;700&display=swap');
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #f7f9fb;
+            color: #1f2937;
+        }
+
+        /* סגנונות גרירה ומטרה */
+        .draggable {
+            cursor: grab;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center; /* כדי שיראה טוב יותר בתוך הגריד */
+        }
+        .draggable:active {
+            cursor: grabbing;
+            opacity: 0.8;
+            transform: scale(1.02);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+        .drop-target {
+            min-height: 8rem; /* גובה מינימלי למניעת CLS */
+            transition: background-color 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .drop-zone-hover {
+            background-color: #e0f2f1; /* צבע בהיר בריחוף */
+            border: 2px dashed #0d9488;
+        }
+        .dropped-item {
+            cursor: default !important;
+            opacity: 1 !important;
+            pointer-events: none; /* מונע גרירה חוזרת אחרי הנחה נכונה */
+        }
+
+        /* אנימציית קונפטי */
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f0f;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1000;
+            animation: confetti-fall 5s linear infinite;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-10 min-h-screen">
+
+    <header class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-teal-700">השוואה: וונדר וומן והזקן והעקרב</h1>
+        <p class="text-xl text-gray-600 mt-2">גרור את המשפטים למקומם הנכון בטבלת ההשוואה.</p>
+    </header>
+
+    <div id="feedback-message" class="text-center mb-6 text-lg font-semibold h-8">
+        <!-- הודעות פידבק יופיעו כאן -->
+    </div>
+
+    <!-- טבלת ההשוואה (מטרות הגרירה) - כעת ברוחב מלא -->
+    <div class="w-full mb-8">
+        <div class="grid grid-cols-3 gap-1 bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+            <!-- כותרות הטבלה -->
+            <div class="col-span-1 p-3 text-center bg-teal-600 text-white font-bold text-lg border-l border-teal-700">נושא ההשוואה</div>
+            <div class="col-span-1 p-3 text-center bg-blue-600 text-white font-bold text-lg border-l border-blue-700">וונדר וומן 🦸‍♀️</div>
+            <div class="col-span-1 p-3 text-center bg-yellow-600 text-white font-bold text-lg">הזקן והעקרב 👴🦂</div>
+
+            <!-- שורות הטבלה - נוצרו מראש כ-Drop Zones -->
+            <!-- שורה 1: כוח -->
+            <div class="col-span-1 p-3 font-medium bg-gray-100 border-l border-gray-300 flex items-center justify-center">כוח</div>
+            <div id="ww-כוח" data-target="ww" data-category="כוח" class="col-span-1 p-2 drop-target border-l border-gray-300"></div>
+            <div id="oms-כוח" data-target="oms" data-category="כוח" class="col-span-1 p-2 drop-target"></div>
+
+            <!-- שורה 2: מעשה גבורה -->
+            <div class="col-span-1 p-3 font-medium bg-gray-100 border-l border-gray-300 flex items-center justify-center">מעשה גבורה</div>
+            <div id="ww-מעשה גבורה" data-target="ww" data-category="מעשה גבורה" class="col-span-1 p-2 drop-target border-l border-gray-300"></div>
+            <div id="oms-מעשה גבורה" data-target="oms" data-category="מעשה גבורה" class="col-span-1 p-2 drop-target"></div>
+
+            <!-- שורה 3: מניע לפעולה -->
+            <div class="col-span-1 p-3 font-medium bg-gray-100 border-l border-gray-300 flex items-center justify-center">מניע לפעולה</div>
+            <div id="ww-מניע לפעולה" data-target="ww" data-category="מניע לפעולה" class="col-span-1 p-2 drop-target border-l border-gray-300"></div>
+            <div id="oms-מניע לפעולה" data-target="oms" data-category="מניע לפעולה" class="col-span-1 p-2 drop-target"></div>
+
+            <!-- שורה 4: קושי / סכנה -->
+            <div class="col-span-1 p-3 font-medium bg-gray-100 border-l border-gray-300 flex items-center justify-center">קושי / סכנה</div>
+            <div id="ww-קושי / סכנה" data-target="ww" data-category="קושי / סכנה" class="col-span-1 p-2 drop-target border-l border-gray-300"></div>
+            <div id="oms-קושי / סכנה" data-target="oms" data-category="קושי / סכנה" class="col-span-1 p-2 drop-target"></div>
+
+            <!-- שורה 5: תכונה מרכזית -->
+            <div class="col-span-1 p-3 font-medium bg-gray-100 border-l border-gray-300 flex items-center justify-center">תכונה מרכזית</div>
+            <div id="ww-תכונה מרכזית" data-target="ww" data-category="תכונה מרכזית" class="col-span-1 p-2 drop-target border-l border-gray-300"></div>
+            <div id="oms-תכונה מרכזית" data-target="oms" data-category="תכונה מרכזית" class="col-span-1 p-2 drop-target"></div>
+
+            <!-- שורה 6: המסר הסופי -->
+            <div class="col-span-1 p-3 font-medium bg-gray-100 border-l border-gray-300 flex items-center justify-center">המסר הסופי</div>
+            <div id="ww-המסר הסופי" data-target="ww" data-category="המסר הסופי" class="col-span-1 p-2 drop-target border-l border-gray-300"></div>
+            <div id="oms-המסר הסופי" data-target="oms" data-category="המסר הסופי" class="col-span-1 p-2 drop-target"></div>
+        </div>
+    </div>
+
+    <!-- עמודת פריטים לגרירה - כעת מתחת לטבלה -->
+    <div class="w-full bg-white p-6 rounded-xl shadow-lg border border-gray-200">
+        <h2 class="text-2xl font-bold mb-4 text-gray-700 border-b pb-2 text-center">המשפטים לגרירה</h2>
+        <!-- שימוש ב-grid לתצוגה אופקית/רספונסיבית של הפריטים -->
+        <div id="draggable-items-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <!-- פריטי הגרירה יוצגו כאן ע"י JavaScript -->
+        </div>
+        <div id="remaining-count" class="mt-4 text-center text-gray-500 font-medium">נותרו להתאמה: 12</div>
+    </div>
+
+
+    <!-- Modal for Completion Message -->
+    <div id="completion-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 hidden items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-sm mx-4 transform transition-all scale-100">
+            <i class="fas fa-medal text-6xl text-yellow-500 mb-4 animate-bounce"></i>
+            <h3 class="text-3xl font-extrabold text-green-600">כל הכבוד!</h3>
+            <p class="text-xl mt-4 text-gray-700">סיימת בהצלחה את טבלת ההשוואה!</p>
+            <button onclick="window.location.reload()" class="mt-6 px-6 py-2 bg-teal-500 text-white font-bold rounded-lg hover:bg-teal-600 transition duration-300">
+                שחק שוב
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const COMPARISON_DATA = [
+            // Wonder Woman Items
+            { text: "כוח־על, עפה, משתמשת במגן ובחבל אמת", target: 'ww', category: "כוח" },
+            { text: "מצילה ילדה מבניין בוער ומגלה את המצית", target: 'ww', category: "מעשה גבורה" },
+            { text: "להציל ולשמור על צדק בעולם", target: 'ww', category: "מניע לפעולה" },
+            { text: "אש, עשן, מצית מסוכן", target: 'ww', category: "קושי / סכנה" },
+            { text: "אומץ, צדק, תעוזה", target: 'ww', category: "תכונה מרכזית" },
+            { text: "הכוח האמיתי הוא בלב טוב", target: 'ww', category: "המסר הסופי" },
+            // Old Man and Scorpion Items (oms)
+            { text: "כוח פנימי, חוזק לב ואמונה בטוב", target: 'oms', category: "כוח" },
+            { text: "מציל עקרב אף שהוא נעקץ שוב ושוב", target: 'oms', category: "מעשה גבורה" },
+            { text: "לעזור כי זה בטבעו – לעשות טוב", target: 'oms', category: "מניע לפעולה" },
+            { text: "עקיצות, כאב פיזי", target: 'oms', category: "קושי / סכנה" },
+            { text: "חמלה, סבלנות, טוב לב", target: 'oms', category: "תכונה מרכזית" },
+            { text: "הגבורה האמיתית היא בכוח הלב לבחור בטוב", target: 'oms', category: "המסר הסופי" }
+        ];
+
+        const totalItems = COMPARISON_DATA.length;
+        let correctDropsCount = 0;
+
+        const draggableContainer = document.getElementById('draggable-items-container');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const completionModal = document.getElementById('completion-modal');
+        const remainingCountElement = document.getElementById('remaining-count');
+
+        // פונקציית ערבוב למערך
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // 1. אתחול המשחק: ערבוב והצגת הפריטים הניתנים לגרירה
+        function initializeGame() {
+            shuffleArray(COMPARISON_DATA);
+            draggableContainer.innerHTML = '';
+            correctDropsCount = 0;
+            remainingCountElement.textContent = `נותרו להתאמה: ${totalItems}`;
+
+            COMPARISON_DATA.forEach((item, index) => {
+                const itemElement = document.createElement('div');
+                itemElement.id = `item-${index}`;
+                // הסרנו את space-y-3 מהקונטיינר, אז הקלאסים נשארים פשוטים
+                itemElement.classList.add('draggable', 'p-3', 'bg-blue-100', 'hover:bg-blue-200', 'rounded-lg', 'font-medium', 'text-sm', 'text-gray-800');
+                itemElement.setAttribute('draggable', 'true');
+                itemElement.setAttribute('data-correct-target', item.target);
+                itemElement.setAttribute('data-category', item.category);
+                itemElement.textContent = item.text;
+
+                itemElement.addEventListener('dragstart', handleDragStart);
+                draggableContainer.appendChild(itemElement);
+            });
+
+            // הוספת מאזינים לכל אזורי ההטלה
+            document.querySelectorAll('.drop-target').forEach(zone => {
+                zone.innerHTML = ''; // מנקה כל פריט קודם
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('dragleave', handleDragLeave);
+                zone.addEventListener('drop', handleDrop);
+            });
+        }
+
+        // פונקציות Drag & Drop
+        function handleDragStart(e) {
+            // שומר את ה-ID של האלמנט הנגרר ואת נתוני היעד הנכונים שלו
+            e.dataTransfer.setData('text/plain', e.target.id);
+            e.dataTransfer.setData('data-correct-target', e.target.getAttribute('data-correct-target'));
+            e.dataTransfer.setData('data-category', e.target.getAttribute('data-category'));
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault(); // מאפשר הטלה
+            e.currentTarget.classList.add('drop-zone-hover');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drop-zone-hover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const dropZone = e.currentTarget;
+            dropZone.classList.remove('drop-zone-hover');
+
+            // בדיקה האם כבר יש פריט באזור זה
+            if (dropZone.children.length > 0) {
+                showFeedback("כאן כבר יש משפט, נסה באזור אחר.", 'bg-yellow-100', '#D97706');
+                return;
+            }
+
+            const draggedId = e.dataTransfer.getData('text/plain');
+            const draggedCorrectTarget = e.dataTransfer.getData('data-correct-target');
+            const draggedCategory = e.dataTransfer.getData('data-category');
+
+            const target = dropZone.getAttribute('data-target');
+            const category = dropZone.getAttribute('data-category');
+
+            // בדיקת נכונות: האם היעד הנכון מתאים לאזור ההטלה (ww/oms) והאם הקטגוריה מתאימה
+            const isTargetCorrect = draggedCorrectTarget === target;
+            const isCategoryCorrect = draggedCategory === category;
+
+            if (isTargetCorrect && isCategoryCorrect) {
+                const draggedElement = document.getElementById(draggedId);
+
+                // הזזת הפריט הנגרר לאזור ההטלה
+                dropZone.appendChild(draggedElement);
+                // עדכון קלאסים לפריט שהונח נכון
+                draggedElement.classList.remove('draggable', 'bg-blue-100', 'hover:bg-blue-200');
+                draggedElement.classList.add('dropped-item', 'bg-green-100', 'w-full', 'h-full', 'p-2', 'shadow-none', 'flex', 'items-center', 'justify-center');
+                
+                // הסרת המאזינים כדי למנוע גרירה חוזרת
+                draggedElement.removeEventListener('dragstart', handleDragStart);
+
+                showFeedback("יפה, המשך...", 'bg-green-100', '#059669');
+                correctDropsCount++;
+                updateRemainingCount();
+                
+                checkCompletion();
+            } else {
+                showFeedback("נסה שוב", 'bg-red-100', '#DC2626');
+            }
+        }
+
+        // פונקציית הצגת פידבק
+        function showFeedback(message, bgColor, textColor) {
+            feedbackMessage.textContent = message;
+            feedbackMessage.style.backgroundColor = bgColor;
+            feedbackMessage.style.color = textColor;
+            feedbackMessage.classList.add('p-2', 'rounded-lg', 'transition-all', 'duration-300', 'shadow-md');
+
+            setTimeout(() => {
+                feedbackMessage.textContent = '';
+                feedbackMessage.classList.remove('p-2', 'rounded-lg', 'transition-all', 'duration-300', 'shadow-md');
+                feedbackMessage.style.backgroundColor = '';
+                feedbackMessage.style.color = '';
+            }, 1500);
+        }
+
+        // עדכון מונה הפריטים שנותרו
+        function updateRemainingCount() {
+            const remaining = totalItems - correctDropsCount;
+            remainingCountElement.textContent = `נותרו להתאמה: ${remaining}`;
+        }
+
+        // פונקציית בדיקת סיום המשחק
+        function checkCompletion() {
+            if (correctDropsCount === totalItems) {
+                // הצגת המודל
+                completionModal.classList.remove('hidden');
+                completionModal.classList.add('flex');
+                
+                // אפקט פיצוצים (קונפטי)
+                confettiEffect();
+            }
+        }
+
+        // פונקציית אפקט הקונפטי
+        function confettiEffect() {
+            const colors = ['#f00', '#0f0', '#00f', '#ff0', '#0ff', '#f0f'];
+            const container = document.body;
+
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = `${-Math.random() * 5}s`;
+                confetti.style.animationDuration = `${3 + Math.random() * 2}s`;
+                container.appendChild(confetti);
+
+                // הסרת האלמנטים לאחר סיום האנימציה (כדי לא לצבור אותם)
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+            
+            // מפסיק את הלולאה החוזרת כדי למנוע הצפה של קונפטי אחרי זמן מה
+            setTimeout(() => { /* No more recursive calls */ }, 500);
+        }
+        
+        // תיקון: אם המשחק נטען מחדש, הקונפטי ימשיך להופיע.
+        // נוודא שקריאות חוזרות לקונפטי מנוהלות נכון או יופסקו.
+        let confettiInterval;
+
+        function confettiEffect() {
+            // מנקה אם יש לולאה קודמת
+            if (confettiInterval) {
+                clearInterval(confettiInterval);
+            }
+
+            const colors = ['#f00', '#0f0', '#00f', '#ff0', '#0ff', '#f0f'];
+            const container = document.body;
+            let counter = 0;
+            const maxBursts = 6; // מספר ה"פיצוצים" שאנחנו רוצים
+
+            function createConfettiBurst() {
+                if (counter >= maxBursts) {
+                    clearInterval(confettiInterval);
+                    return;
+                }
+                
+                for (let i = 0; i < 50; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.classList.add('confetti');
+                    confetti.style.left = `${Math.random() * 100}vw`;
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = `${-Math.random() * 5}s`;
+                    confetti.style.animationDuration = `${3 + Math.random() * 2}s`;
+                    container.appendChild(confetti);
+
+                    // הסרת האלמנטים לאחר סיום האנימציה
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 5000);
+                }
+                counter++;
+            }
+
+            // הפעלת הפיצוץ הראשון
+            createConfettiBurst();
+            
+            // הגדרה של פיצוצים נוספים כל חצי שנייה
+            confettiInterval = setInterval(createConfettiBurst, 500); 
+        }
+
+        // הפעלת המשחק עם טעינת העמוד
+        window.onload = initializeGame;
+    </script>
+</body>
+</html>
