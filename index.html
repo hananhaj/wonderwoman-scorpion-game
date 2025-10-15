@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>משחק השוואה חזותי: וונדר וומן ⚡️ והזקן החכם 🦂</title>
+    <title>השוואה בין גיבור על וגיבור אמיתי</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome for the completion icon -->
@@ -13,64 +13,101 @@
         @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap');
         body {
             font-family: 'Heebo', sans-serif;
-            background-color: #f0f4f8; /* רקע בהיר ונעים */
+            background-color: #f0f4f8; 
             color: #1a202c;
+            /* שינוי: הסרנו את חסימת הגלילה ואת מרכוז התוכן האנכי */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.5rem; /* הוספת ריפוד קל סביב הדף */
         }
-
+        
+        /* מיכל ראשי גמיש ומרכזי - הוסר גובה קבוע */
+        #main-container {
+            width: 98%; 
+            max-width: 1200px; 
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem; /* הגדלתי את הרווחים קצת לאסתטיקה (מ-0.25rem) */
+            margin: 0.5rem auto; /* הגדלתי שוליים אנכיים (מ-0.25rem) */
+            /* שינוי: הוסר גובה קבוע (height: 98vh;) כדי לאפשר גלילת דף */
+        }
+        
         /* סגנונות גרירה ומטרה */
         .draggable {
             cursor: grab;
             transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
             text-align: center;
         }
         .draggable:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        }
-        .draggable:active {
-            cursor: grabbing;
-            opacity: 0.9;
-            transform: scale(1.02);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
         }
         .drop-target {
-            min-height: 7.5rem; /* גובה מינימלי למניעת CLS */
+            min-height: 3rem; 
             transition: background-color 0.2s, border 0.2s;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
+            font-size: 0.875rem; 
         }
         .drop-zone-hover {
-            background-color: #ffe0b2; /* צבע כתום בהיר בריחוף */
-            border: 3px dashed #ff9800;
+            background-color: #fce7f3; 
+            border: 3px dashed #db2777;
         }
         .dropped-item {
             cursor: default !important;
             opacity: 1 !important;
             pointer-events: none;
-            font-weight: 500;
+            font-weight: 700; 
+            color: #1f2937; 
+            font-size: 0.8rem; 
         }
 
-        /* סגנון כותרות הטבלה עם רקע גרדיאנט ומעוצב */
+        /* סגנון כותרות הטבלה */
         .header-ww {
-            background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%); /* כחול של גיבורי על */
+            background: linear-gradient(135deg, #0077b6 0%, #00b4d8 100%); 
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-            border-bottom: 5px solid #fbbf24;
+            border-bottom: 5px solid #ffba08;
+            font-size: 1.125rem; 
         }
         .header-oms {
-            background: linear-gradient(135deg, #f59e0b 0%, #fcd34d 100%); /* זהב חם וחכם */
+            background: linear-gradient(135deg, #f77f00 0%, #fcbf49 100%); 
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-            border-bottom: 5px solid #1d4ed8;
+            border-bottom: 5px solid #0077b6;
+            font-size: 1.125rem;
         }
         .header-topic {
-            background-color: #064e3b; /* ירוק כהה */
+            background-color: #38a169; 
             color: white;
             border-bottom: 5px solid #6ee7b7;
+            font-size: 1.125rem;
         }
 
+        /* --- 4 סגנונות צבע לכרטיסיות הגרירה (2 ל-WW, 2 ל-OMS) --- */
+        /* WW - צבעים קרים */
+        .color-ww-1 { background-color: #90e0ef; color: #03045e; border-bottom: 4px solid #00b4d8; } /* תכלת בהיר */
+        .color-ww-2 { background-color: #48cae4; color: #023e8a; border-bottom: 4px solid #0077b6; } /* כחול ביניים */
+
+        /* OMS - צבעים חמים */
+        .color-oms-1 { background-color: #ffe8d6; color: #ff8500; border-bottom: 4px solid #ffba08; } /* כתום אפרסק בהיר */
+        .color-oms-2 { background-color: #ffb703; color: #a0522d; border-bottom: 4px solid #fb8500; } /* צהוב חרדל */
+
+
+        /* סגנון הרקע של הפריטים כשהם מוטלים בטבלה */
+        .dropped-ww { background-color: #e0f7fa; } 
+        .dropped-oms { background-color: #fff8e1; } 
+
+        /* מיכל כרטיסיות גמיש */
+        #draggable-items-container {
+            flex-shrink: 0; 
+            /* הסרנו את ה-overflow: auto שהיה כאן בעבר */
+        }
+        
         /* אנימציית קונפטי */
         @keyframes confetti-fall {
             0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
@@ -89,70 +126,67 @@
         }
     </style>
 </head>
-<body class="p-4 md:p-10 min-h-screen">
+<body class="p-1 md:p-2"> 
 
-    <header class="text-center mb-10 p-4 bg-white rounded-xl shadow-lg border-b-4 border-teal-500">
-        <h1 class="text-4xl font-extrabold text-gray-800">משחק השוואה: גבורה פנימית מול חיצונית</h1>
-        <p class="text-xl text-gray-600 mt-2">גרור את הקלפים הצבעוניים למקומם הנכון בטבלה.</p>
-    </header>
-
-    <div id="feedback-message" class="text-center mb-6 text-lg font-bold h-8">
-        <!-- הודעות פידבק יופיעו כאן -->
-    </div>
-
-    <!-- טבלת ההשוואה (מטרות הגרירה) -->
-    <div class="w-full mb-8">
-        <div class="grid grid-cols-3 gap-1 bg-white rounded-xl shadow-2xl overflow-hidden">
-            <!-- כותרות הטבלה - עם אייקונים ועיצוב חדש -->
-            <div class="col-span-1 p-3 text-center header-topic text-white font-black text-lg">נושא ההשוואה 🔎</div>
-            <div class="col-span-1 p-3 text-center header-ww text-white font-black text-lg border-l border-blue-900 flex items-center justify-center">
-                <i class="fas fa-bolt text-yellow-300 ml-2"></i> וונדר וומן 🦸‍♀️
-            </div>
-            <div class="col-span-1 p-3 text-center header-oms text-white font-black text-lg flex items-center justify-center">
-                הזקן והעקרב 👴🦂
-            </div>
-
-            <!-- שורות הטבלה - נוצרו מראש כ-Drop Zones -->
-            <!-- שורה 1: כוח -->
-            <div class="col-span-1 p-3 font-semibold bg-gray-100 border-l border-gray-300 flex items-center justify-center text-lg">כוח 💪</div>
-            <div id="ww-כוח" data-target="ww" data-category="כוח" class="col-span-1 p-2 drop-target bg-blue-50 border-l border-gray-300"></div>
-            <div id="oms-כוח" data-target="oms" data-category="כוח" class="col-span-1 p-2 drop-target bg-yellow-50"></div>
-
-            <!-- שורה 2: מעשה גבורה -->
-            <div class="col-span-1 p-3 font-semibold bg-gray-100 border-l border-gray-300 flex items-center justify-center text-lg">מעשה גבורה 🔥</div>
-            <div id="ww-מעשה גבורה" data-target="ww" data-category="מעשה גבורה" class="col-span-1 p-2 drop-target bg-blue-50 border-l border-gray-300"></div>
-            <div id="oms-מעשה גבורה" data-target="oms" data-category="מעשה גבורה" class="col-span-1 p-2 drop-target bg-yellow-50"></div>
-
-            <!-- שורה 3: מניע לפעולה -->
-            <div class="col-span-1 p-3 font-semibold bg-gray-100 border-l border-gray-300 flex items-center justify-center text-lg">מניע לפעולה 🎯</div>
-            <div id="ww-מניע לפעולה" data-target="ww" data-category="מניע לפעולה" class="col-span-1 p-2 drop-target bg-blue-50 border-l border-gray-300"></div>
-            <div id="oms-מניע לפעולה" data-target="oms" data-category="מניע לפעולה" class="col-span-1 p-2 drop-target bg-yellow-50"></div>
-
-            <!-- שורה 4: קושי / סכנה -->
-            <div class="col-span-1 p-3 font-semibold bg-gray-100 border-l border-gray-300 flex items-center justify-center text-lg">קושי / סכנה ⚠️</div>
-            <div id="ww-קושי / סכנה" data-target="ww" data-category="קושי / סכנה" class="col-span-1 p-2 drop-target bg-blue-50 border-l border-gray-300"></div>
-            <div id="oms-קושי / סכנה" data-target="oms" data-category="קושי / סכנה" class="col-span-1 p-2 drop-target bg-yellow-50"></div>
-
-            <!-- שורה 5: תכונה מרכזית -->
-            <div class="col-span-1 p-3 font-semibold bg-gray-100 border-l border-gray-300 flex items-center justify-center text-lg">תכונה מרכזית 💖</div>
-            <div id="ww-תכונה מרכזית" data-target="ww" data-category="תכונה מרכזית" class="col-span-1 p-2 drop-target bg-blue-50 border-l border-gray-300"></div>
-            <div id="oms-תכונה מרכזית" data-target="oms" data-category="תכונה מרכזית" class="col-span-1 p-2 drop-target bg-yellow-50"></div>
-
-            <!-- שורה 6: המסר הסופי -->
-            <div class="col-span-1 p-3 font-semibold bg-gray-100 border-l border-gray-300 flex items-center justify-center text-lg">המסר הסופי 💡</div>
-            <div id="ww-המסר הסופי" data-target="ww" data-category="המסר הסופי" class="col-span-1 p-2 drop-target bg-blue-50 border-l border-gray-300"></div>
-            <div id="oms-המסר הסופי" data-target="oms" data-category="המסר הסופי" class="col-span-1 p-2 drop-target bg-yellow-50"></div>
+    <div id="main-container">
+        <header class="text-center p-2 bg-white rounded-xl shadow-lg border-b-4 border-green-500">
+            <h1 class="text-2xl font-extrabold text-gray-800 md:text-3xl">השוואה בין גיבור על וגיבור אמיתי 🌟</h1>
+            <p class="text-base text-gray-600 mt-1">גרור את הקלפים הצבעוניים למקומם הנכון בטבלה.</p>
+        </header>
+    
+        <div id="feedback-message" class="text-center font-bold h-6 text-sm md:text-base">
+            <!-- הודעות פידבק יופיעו כאן -->
         </div>
-    </div>
-
-    <!-- כרטיסיות לגרירה - מעוצבים כ"קלפים" -->
-    <div class="w-full bg-white p-6 rounded-xl shadow-2xl border border-gray-200">
-        <h2 class="text-2xl font-black mb-4 text-teal-700 border-b pb-2 text-center">בנק המשפטים 📜</h2>
-        <!-- שימוש ב-grid לתצוגה אופקית/רספונסיבית של הפריטים -->
-        <div id="draggable-items-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            <!-- פריטי הגרירה יוצגו כאן ע"י JavaScript -->
+    
+        <!-- טבלת ההשוואה (מטרות הגרירה) -->
+        <div class="w-full flex-grow">
+            <div class="grid grid-cols-3 gap-1 bg-white rounded-xl shadow-2xl overflow-hidden">
+                <!-- כותרות הטבלה - עם אייקונים ועיצוב חדש -->
+                <div class="col-span-1 p-2 text-center header-topic text-white font-black">נושא ההשוואה 🔎</div>
+                <div class="col-span-1 p-2 text-center header-ww text-white font-black border-l border-blue-900 flex items-center justify-center">
+                    <i class="fas fa-bolt text-yellow-300 ml-2"></i> וונדר וומן 🦸‍♀️
+                </div>
+                <div class="col-span-1 p-2 text-center header-oms text-white font-black flex items-center justify-center">
+                    הזקן והעקרב 👴🦂
+                </div>
+    
+                <!-- שורות הטבלה - עם padding מופחת (p-1) וגודל פונט קטן יותר -->
+                
+                <div class="col-span-1 p-2 font-semibold bg-gray-100 border-l border-gray-300 flex items-center justify-center text-sm">כוח 💪</div>
+                <div id="ww-כוח" data-target="ww" data-category="כוח" class="col-span-1 p-1 drop-target bg-blue-50 border-l border-gray-300"></div>
+                <div id="oms-כוח" data-target="oms" data-category="כוח" class="col-span-1 p-1 drop-target bg-yellow-50"></div>
+    
+                <div class="col-span-1 p-2 font-semibold bg-gray-100 border-l border-gray-300 flex items-center justify-center text-sm">מעשה גבורה 🔥</div>
+                <div id="ww-מעשה גבורה" data-target="ww" data-category="מעשה גבורה" class="col-span-1 p-1 drop-target bg-blue-50 border-l border-gray-300"></div>
+                <div id="oms-מעשה גבורה" data-target="oms" data-category="מעשה גבורה" class="col-span-1 p-1 drop-target bg-yellow-50"></div>
+    
+                <div class="col-span-1 p-2 font-semibold bg-gray-100 border-l border-gray-300 flex items-center justify-center text-sm">מניע לפעולה 🎯</div>
+                <div id="ww-מניע לפעולה" data-target="ww" data-category="מניע לפעולה" class="col-span-1 p-1 drop-target bg-blue-50 border-l border-gray-300"></div>
+                <div id="oms-מניע לפעולה" data-target="oms" data-category="מניע לפעולה" class="col-span-1 p-1 drop-target bg-yellow-50"></div>
+    
+                <div class="col-span-1 p-2 font-semibold bg-gray-100 border-l border-gray-300 flex items-center justify-center text-sm">קושי / סכנה ⚠️</div>
+                <div id="ww-קושי / סכנה" data-target="ww" data-category="קושי / סכנה" class="col-span-1 p-1 drop-target bg-blue-50 border-l border-gray-300"></div>
+                <div id="oms-קושי / סכנה" data-target="oms" data-category="קושי / סכנה" class="col-span-1 p-1 drop-target bg-yellow-50"></div>
+    
+                <div class="col-span-1 p-2 font-semibold bg-gray-100 border-l border-gray-300 flex items-center justify-center text-sm">תכונה מרכזית 💖</div>
+                <div id="ww-תכונה מרכזית" data-target="ww" data-category="תכונה מרכזית" class="col-span-1 p-1 drop-target bg-blue-50 border-l border-gray-300"></div>
+                <div id="oms-תכונה מרכזית" data-target="oms" data-category="תכונה מרכזית" class="col-span-1 p-1 drop-target bg-yellow-50"></div>
+    
+                <div class="col-span-1 p-2 font-semibold bg-gray-100 border-l border-gray-300 flex items-center justify-center text-sm">המסר הסופי 💡</div>
+                <div id="ww-המסר הסופי" data-target="ww" data-category="המסר הסופי" class="col-span-1 p-1 drop-target bg-blue-50 border-l border-gray-300"></div>
+                <div id="oms-המסר הסופי" data-target="oms" data-category="המסר הסופי" class="col-span-1 p-1 drop-target bg-yellow-50"></div>
+            </div>
         </div>
-        <div id="remaining-count" class="mt-4 text-center text-gray-500 font-medium">נותרו להתאמה: 12</div>
+    
+        <!-- כרטיסיות לגרירה - מעוצבים כ"קלפים" -->
+        <div class="w-full bg-white p-3 rounded-xl shadow-2xl border border-gray-200" style="flex-shrink: 0;">
+            <h2 class="text-lg font-black mb-2 text-teal-700 border-b pb-1 text-center">בנק המשפטים 📜</h2>
+            <!-- צמצום הפונטים ושימוש ב-grid קטן יותר -->
+            <div id="draggable-items-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6 gap-2">
+                <!-- פריטי הגרירה יוצגו כאן ע"י JavaScript -->
+            </div>
+            <div id="remaining-count" class="mt-2 text-center text-gray-500 font-medium text-xs">נותרו להתאמה: 12</div>
+        </div>
     </div>
 
 
@@ -169,23 +203,23 @@
     </div>
 
     <script>
-        // הנתונים המקוריים נשמרו, נוספו להם אימוג'ים כדי להפוך אותם למושכים יותר
+        // הקלפים משתמשים ב-4 צבעים: color-ww-1 ו-color-ww-2 ל-WW, ו-color-oms-1 ו-color-oms-2 ל-OMS.
         const COMPARISON_DATA = [
-            // Wonder Woman Items (WW - כחול)
-            { text: "כוח־על, עפה, מגן וחבל אמת 💥", target: 'ww', category: "כוח", color: 'blue' },
-            { text: "מצילה ילדה מבניין בוער 🚒", target: 'ww', category: "מעשה גבורה", color: 'blue' },
-            { text: "להציל ולשמור על צדק בעולם 🌎", target: 'ww', category: "מניע לפעולה", color: 'blue' },
-            { text: "אש, עשן ומצית מסוכן 🚨", target: 'ww', category: "קושי / סכנה", color: 'blue' },
-            { text: "אומץ, צדק, תעוזה 🛡️", target: 'ww', category: "תכונה מרכזית", color: 'blue' },
-            { text: "הכוח האמיתי הוא בלב טוב ❤️", target: 'ww', category: "המסר הסופי", color: 'blue' },
+            // Wonder Woman Items (WW - צבעים קרים - 3x1, 3x2)
+            { text: "כוח־על, עפה, מגן וחבל אמת 💥", target: 'ww', category: "כוח", color: 'color-ww-1' },
+            { text: "מצילה ילדה מבניין בוער 🚒", target: 'ww', category: "מעשה גבורה", color: 'color-ww-2' },
+            { text: "להציל ולשמור על צדק בעולם 🌎", target: 'ww', category: "מניע לפעולה", color: 'color-ww-1' },
+            { text: "אש, עשן ומצית מסוכן 🚨", target: 'ww', category: "קושי / סכנה", color: 'color-ww-2' },
+            { text: "אומץ, צדק, תעוזה 🛡️", target: 'ww', category: "תכונה מרכזית", color: 'color-ww-1' },
+            { text: "הכוח האמיתי הוא בלב טוב ❤️", target: 'ww', category: "המסר הסופי", color: 'color-ww-2' },
             
-            // Old Man and Scorpion Items (OMS - זהב)
-            { text: "כוח פנימי, חוזק לב ואמונה בטוב ✨", target: 'oms', category: "כוח", color: 'yellow' },
-            { text: "מציל עקרב אף שהוא נעקץ שוב ושוב 🦂", target: 'oms', category: "מעשה גבורה", color: 'yellow' },
-            { text: "לעזור כי זה בטבעו – לעשות טוב 🌱", target: 'oms', category: "מניע לפעולה", color: 'yellow' },
-            { text: "עקיצות וכאב פיזי 💉", target: 'oms', category: "קושי / סכנה", color: 'yellow' },
-            { text: "חמלה, סבלנות, טוב לב 🤲", target: 'oms', category: "תכונה מרכזית", color: 'yellow' },
-            { text: "הגבורה האמיתית היא בכוח הלב לבחור בטוב 👑", target: 'oms', category: "המסר הסופי", color: 'yellow' }
+            // Old Man and Scorpion Items (OMS - צבעים חמים - 3x1, 3x2)
+            { text: "כוח פנימי, חוזק לב ואמונה בטוב ✨", target: 'oms', category: "כוח", color: 'color-oms-1' },
+            { text: "מציל עקרב אף שהוא נעקץ שוב ושוב 🦂", target: 'oms', category: "מעשה גבורה", color: 'color-oms-2' },
+            { text: "לעזור כי זה בטבעו – לעשות טוב 🌱", target: 'oms', category: "מניע לפעולה", color: 'color-oms-1' },
+            { text: "עקיצות וכאב פיזי 💉", target: 'oms', category: "קושי / סכנה", color: 'color-oms-2' },
+            { text: "חמלה, סבלנות, טוב לב 🤲", target: 'oms', category: "תכונה מרכזית", color: 'color-oms-1' },
+            { text: "הגבורה האמיתית היא בכוח הלב לבחור בטוב 👑", target: 'oms', category: "המסר הסופי", color: 'color-oms-2' }
         ];
 
         const totalItems = COMPARISON_DATA.length;
@@ -195,9 +229,9 @@
         const feedbackMessage = document.getElementById('feedback-message');
         const completionModal = document.getElementById('completion-modal');
         const remainingCountElement = document.getElementById('remaining-count');
-        let confettiInterval; // לשליטה על אפקט הקונפטי
+        let confettiInterval; 
 
-        // פונקציית ערבוב למערך
+        // פונקציית ערבוב
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -205,7 +239,7 @@
             }
         }
 
-        // 1. אתחול המשחק: ערבוב והצגת הפריטים הניתנים לגרירה
+        // 1. אתחול המשחק
         function initializeGame() {
             shuffleArray(COMPARISON_DATA);
             draggableContainer.innerHTML = '';
@@ -215,20 +249,17 @@
             COMPARISON_DATA.forEach((item, index) => {
                 const itemElement = document.createElement('div');
                 itemElement.id = `item-${index}`;
-                // קלאסים חדשים לעיצוב כרטיסייה צבעונית
-                let bgClass = item.color === 'blue' ? 'bg-blue-300 text-blue-900 border-b-4 border-blue-600' : 'bg-yellow-300 text-yellow-900 border-b-4 border-yellow-600';
                 
-                // *** תיקון השגיאה: פיצול מחרוזת הקלאסים והוספתם בנפרד ***
-                const baseClasses = ['draggable', 'p-4', 'rounded-xl', 'font-medium', 'text-base', 'shadow-lg'];
-                const dynamicClasses = bgClass.split(' ');
+                // קלאסים בסיסיים ודינמיים
+                const baseClasses = ['draggable', 'p-2', 'rounded-lg', 'font-medium', 'text-xs', 'shadow-md'];
+                const dynamicClasses = item.color.split(' '); 
                 
                 itemElement.classList.add(...baseClasses, ...dynamicClasses);
 
                 itemElement.setAttribute('draggable', 'true');
                 itemElement.setAttribute('data-correct-target', item.target);
                 itemElement.setAttribute('data-category', item.category);
-                // הצבע נשמר כמאפיין נתונים
-                itemElement.setAttribute('data-color', item.color); 
+                itemElement.setAttribute('data-color-group', item.target === 'ww' ? 'dropped-ww' : 'dropped-oms'); 
                 itemElement.textContent = item.text;
 
                 itemElement.addEventListener('dragstart', handleDragStart);
@@ -249,9 +280,8 @@
             e.dataTransfer.setData('text/plain', e.target.id);
             e.dataTransfer.setData('data-correct-target', e.target.getAttribute('data-correct-target'));
             e.dataTransfer.setData('data-category', e.target.getAttribute('data-category'));
-            e.dataTransfer.setData('data-color', e.target.getAttribute('data-color')); // שמירת הצבע המקורי
+            e.dataTransfer.setData('data-color-group', e.target.getAttribute('data-color-group'));
             
-            // הוספת קלאס לזמן הגרירה
             e.target.classList.add('opacity-50');
         }
 
@@ -269,7 +299,6 @@
             const dropZone = e.currentTarget;
             dropZone.classList.remove('drop-zone-hover');
 
-            // בדיקה האם כבר יש פריט באזור זה
             if (dropZone.children.length > 0) {
                 showFeedback("כאן כבר יש משפט, נסה באזור אחר.", 'bg-yellow-100', '#D97706');
                 return;
@@ -278,8 +307,7 @@
             const draggedId = e.dataTransfer.getData('text/plain');
             const draggedCorrectTarget = e.dataTransfer.getData('data-correct-target');
             const draggedCategory = e.dataTransfer.getData('data-category');
-            // שליפת הצבע ממאפיין הנתונים
-            const draggedColor = document.getElementById(draggedId).getAttribute('data-color');
+            const draggedColorGroup = e.dataTransfer.getData('data-color-group');
 
 
             const target = dropZone.getAttribute('data-target');
@@ -291,21 +319,19 @@
             if (isTargetCorrect && isCategoryCorrect) {
                 const draggedElement = document.getElementById(draggedId);
 
-                // עדכון קלאסים: הסרת קלאס ה-draggable והצבע הקודם
-                // הסרת כל קלאסי הצבעים ששימשו לעיצוב הכרטיס
+                // הסרת כל קלאסי העיצוב המקוריים של הכרטיס - רק 4 הצבעים הפעילים
                 draggedElement.classList.remove(
-                    'draggable', 'opacity-50', 
-                    'bg-blue-300', 'text-blue-900', 'border-blue-600', 
-                    'bg-yellow-300', 'text-yellow-900', 'border-yellow-600', 
-                    'shadow-lg'
+                    'draggable', 'opacity-50', 'shadow-md',
+                    'color-ww-1', 'color-ww-2', 
+                    'color-oms-1', 'color-oms-2',
+                    'p-2', 'text-xs', 'font-medium'
                 );
                 
-                draggedElement.classList.add('dropped-item', 'w-full', 'h-full', 'p-2', 'shadow-none', 'flex', 'items-center', 'justify-center', 'text-gray-900', 'font-bold');
+                // הוספת קלאסים לאחר ההטלה - צבע רקע לפי הקבוצה
+                draggedElement.classList.add('dropped-item', 'w-full', 'h-full', 'p-1', 'shadow-none', 'flex', 'items-center', 'justify-center', draggedColorGroup);
                 
-                // התאמת צבע הרקע של הפריט לפי הצבע של הטבלה
-                let droppedBgClass = draggedColor === 'blue' ? 'bg-blue-200' : 'bg-yellow-200';
-                draggedElement.classList.add(droppedBgClass);
-
+                // הסרת צבעי הרקע המקוריים של הטבלה
+                dropZone.classList.remove('bg-blue-50', 'bg-yellow-50');
 
                 // הזזת הפריט הנגרר לאזור ההטלה
                 dropZone.appendChild(draggedElement);
@@ -320,7 +346,7 @@
                 checkCompletion();
             } else {
                 showFeedback("אופס, נסה שוב.", 'bg-red-100', '#DC2626');
-                 document.getElementById(draggedId).classList.remove('opacity-50'); // מחזיר אטימות במקרה של כישלון
+                 document.getElementById(draggedId).classList.remove('opacity-50'); 
             }
         }
 
@@ -329,11 +355,11 @@
             feedbackMessage.textContent = message;
             feedbackMessage.style.backgroundColor = bgColor;
             feedbackMessage.style.color = textColor;
-            feedbackMessage.classList.add('p-2', 'rounded-lg', 'transition-all', 'duration-300', 'shadow-md', 'scale-105');
+            feedbackMessage.classList.add('p-1', 'rounded-lg', 'transition-all', 'duration-300', 'shadow-md', 'scale-105');
 
             setTimeout(() => {
                 feedbackMessage.textContent = '';
-                feedbackMessage.classList.remove('p-2', 'rounded-lg', 'transition-all', 'duration-300', 'shadow-md', 'scale-105');
+                feedbackMessage.classList.remove('p-1', 'rounded-lg', 'transition-all', 'duration-300', 'shadow-md', 'scale-105');
                 feedbackMessage.style.backgroundColor = '';
                 feedbackMessage.style.color = '';
             }, 1500);
@@ -363,7 +389,7 @@
                 clearInterval(confettiInterval);
             }
 
-            const colors = ['#fbbf24', '#3b82f6', '#ef4444', '#10b981', '#f97316']; // צבעי הקונפטי
+            const colors = ['#00b4d8', '#ffba08', '#ef4444', '#38a169', '#ff8500']; 
             const container = document.body;
             let counter = 0;
             const maxBursts = 8; 
@@ -381,8 +407,8 @@
                     confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
                     confetti.style.animationDelay = `${-Math.random() * 5}s`;
                     confetti.style.animationDuration = `${3 + Math.random() * 2}s`;
-                    confetti.style.width = `${5 + Math.random() * 8}px`; // גודל משתנה
-                    confetti.style.height = `${5 + Math.random() * 8}px`; // גודל משתנה
+                    confetti.style.width = `${5 + Math.random() * 8}px`; 
+                    confetti.style.height = `${5 + Math.random() * 8}px`; 
                     container.appendChild(confetti);
 
                     setTimeout(() => {
